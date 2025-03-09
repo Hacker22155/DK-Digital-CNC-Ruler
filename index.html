@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> DK Digital CNC Ruler </title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            text-align: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: bold;
+            color: #ffcc00;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+            animation: neonGlow 1s infinite alternate;
+        }
+
+        @keyframes neonGlow {
+            from { text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00; }
+            to { text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00; }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .input-group {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffcc00;
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            width: calc(100% - 10px);
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ffcc00;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .controls button {
+            padding: 12px;
+            font-size: 16px;
+            background: #ffcc00;
+            color: black;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .controls button:hover {
+            background: #ffdd44;
+        }
+
+        .saved-measurements {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .saved-measurements h2 {
+            color: #ffcc00;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .download-btn {
+            margin-top: 15px;
+            padding: 12px;
+            background: #00ff00;
+            color: black;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #55ff55;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container" id="contentToScreenshot">
+        <h1>🚀 DK Digital Ruler 📏</h1>
+
+        <div class="controls">
+            <div class="input-group">
+                <label for="xSize">X Size (cm)</label>
+                <input type="number" id="xSize" placeholder="Enter X size">
+            </div>
+            <div class="input-group">
+                <label for="ySize">Y Size (cm)</label>
+                <input type="number" id="ySize" placeholder="Enter Y size">
+            </div>
+            <button onclick="saveMeasurement()">Save</button>
+        </div>
+
+        <div class="saved-measurements">
+            <h2>Saved Measurements</h2>
+            <ul id="measurementList"></ul>
+        </div>
+
+        <button class="download-btn" onclick="downloadScreenshot()">Download Screenshot</button>
+    </div>
+
+    <script>
+        let count = 1;
+
+        function saveMeasurement() {
+            let xSize = document.getElementById("xSize").value.trim();
+            let ySize = document.getElementById("ySize").value.trim();
+            let measurementList = document.getElementById("measurementList");
+
+            if (xSize === "" || ySize === "") {
+                alert("Please enter both X and Y sizes!");
+                return;
+            }
+
+            let li = document.createElement("li");
+            li.innerHTML = `<strong>Save ${count}</strong><br>X Size: ${xSize} cm<br>Y Size: ${ySize} cm 
+                            <button class="delete-btn" onclick="confirmDelete(this)">Delete</button>`;
+            measurementList.appendChild(li);
+
+            document.getElementById("xSize").value = "";
+            document.getElementById("ySize").value = "";
+            count++;
+        }
+
+        function confirmDelete(button) {
+            let confirmDelete = confirm("Are you sure you want to delete this measurement?");
+            if (confirmDelete) {
+                button.parentElement.remove();
+            }
+        }
+
+        function downloadScreenshot() {
+            let container = document.querySelector("#contentToScreenshot");
+            html2canvas(container, {
+                allowTaint: true,  // Allow the canvas to pick up external content
+                useCORS: true,     // Enable Cross-Origin Resource Sharing for external images
+                backgroundColor: null, // Keep transparent background
+            }).then(canvas => {
+                let link = document.createElement("a");
+                link.href = canvas.toDataURL("image/png");
+                link.download = "saved_measurements.png";
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
